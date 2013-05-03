@@ -20,6 +20,8 @@ int wmain_internal(int argc, wchar_t* argv[])
 	tp::throw_winerr_when(hFileSrc == NULL);
 	ON_LEAVE_1(CloseHandle(hFileSrc), HANDLE, hFileSrc);
 
+	DWORD dwSrcFileLen = ::GetFileSize(hFileSrc, NULL);
+
 	SETOP(L"Map Source Image file");
 	HANDLE hMap = CreateFileMapping(hFileSrc, NULL, PAGE_READONLY, 0, 0, NULL);
 	tp::throw_winerr_when(hMap == NULL);
@@ -54,15 +56,15 @@ int wmain_internal(int argc, wchar_t* argv[])
 	SafeWriteFile(hFileDst, lpFileBase + dwChecksumPos + 4, dwCertOffsetPos - dwChecksumPos - 4);
 	SafeWriteFile(hFileDst, pNullByte_4, 4);
 	SafeWriteFile(hFileDst, pNullByte_4, 4);
-	SafeWriteFile(hFileDst, lpFileBase + dwCertLengthPos + 4, dwCertOffset - dwCertLengthPos -4);
+	//SafeWriteFile(hFileDst, lpFileBase + dwCertLengthPos + 4, dwCertOffset - dwCertLengthPos -4);
+	SafeWriteFile(hFileDst, lpFileBase + dwCertLengthPos + 4, dwSrcFileLen - dwCertLengthPos -4);
 
 	return 0;
 }
 
 int wmain(int argc, wchar_t* argv[])
 {
-	setlocale(LC_CTYPE, "");
-	wprintf(L"rmsig\n");
+	setlocale(LC_ALL, "");
 
 	try
 	{
